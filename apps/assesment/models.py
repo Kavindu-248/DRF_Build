@@ -2,23 +2,20 @@ from django.db import models
 import uuid
 
 from apps.users.models import Patient, Doctor
+from apps.files.models import File
 
 
 # FormAssesment Model
 
 class FormAssesment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='form_assesments')
+        Patient, on_delete=models.CASCADE, related_name='form_assesments', null=True)
     doctor = models.ForeignKey(
-        Doctor, on_delete=models.CASCADE, related_name='form_assesments')
+        Doctor, on_delete=models.CASCADE, related_name='form_assesments', null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
 
 
 # SubscriptionForm Model
@@ -28,10 +25,7 @@ class SubscriptionForm(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(auto_now=True)
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='subscription_forms')
-
-    def __str__(self):
-        return self.description
+        Patient, on_delete=models.CASCADE, related_name='subscription_forms', null=True)
 
 
 # TreatmentType Model
@@ -39,18 +33,12 @@ class TreatmentType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sickness_type = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.sickness_type
-
 
 # Question Model
 class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=100)
-    treatment_types = models.ManyToManyField(TreatmentType)
-
-    def __str__(self):
-        return self.text
+    treatment_types = models.ManyToManyField(TreatmentType, null=True, related_name='questions', null=False)
 
 
 # Answer Model
@@ -58,12 +46,9 @@ class Answer(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=100)
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name='answers')
+        Question, on_delete=models.CASCADE, related_name='answers', null=True)
     formAssesment = models.ForeignKey(
-        FormAssesment, on_delete=models.CASCADE, related_name='answers')
-
-    def __str__(self):
-        return self.text
+        FormAssesment, on_delete=models.CASCADE, related_name='answers', null=False)
 
 
 # Avalability Model
@@ -74,20 +59,29 @@ class Avalability(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
     doctor = models.ForeignKey(
-        Doctor, on_delete=models.CASCADE, related_name='avalabilities')
-
-    def __str__(self):
-        return self.day
+        Doctor, on_delete=models.CASCADE, related_name='avalabilities', null=True)
 
 
 # Appointment Model
-
 class Appointment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=100)
     date = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='appointments')
+        Patient, on_delete=models.CASCADE, related_name='appointments', null=True)
+
+
+# Attachment Model
+class Attachment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name='attachments', null=True,)
+    file = models.ForeignKey(
+        File, on_delete=models.CASCADE, related_name='attachments')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
-        return self.date
+        return self.file.file_name
