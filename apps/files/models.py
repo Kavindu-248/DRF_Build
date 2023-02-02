@@ -19,20 +19,3 @@ class File(models.Model):
 
     def __str__(self):
         return self.file_name
-
-
-# Patient Attacheed Documents
-
-class Attachment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='attachments', null=True,)
-    file = models.ForeignKey(
-        File, on_delete=models.CASCADE, related_name='attachments')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.file.file_name
