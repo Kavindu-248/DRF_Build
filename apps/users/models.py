@@ -87,7 +87,6 @@ class Patient(models.Model):
     Gender = models.CharField(
         max_length=2,
         choices=Gender.choices,
-        default=Gender.MALE,
     )
 
 
