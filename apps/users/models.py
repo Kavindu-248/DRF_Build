@@ -15,6 +15,9 @@ class Roles(models.TextChoices):
     SUPER_ADMIN = 'SUPER_ADMIN', _('SUPER_ADMIN')
     ADMIN = 'ADMIN', _('ADMIN')
     USER = 'USER', _('USER')
+    PATIENT = 'PATIENT', _('PATIENT')
+    DOCTOR = 'DOCTOR', _('DOCTOR')
+    PHARMACY_USER = 'PHARMACY_USER', _('PHARMACY_USER')
 
 
 class User(AbstractUser, SafeDeleteModel):
@@ -36,6 +39,15 @@ class User(AbstractUser, SafeDeleteModel):
     def is_user(self):
         return self.role == Roles.USER
 
+    def is_patient(self):
+        return self.role == Roles.PATIENT
+
+    def is_doctor(self):
+        return self.role == Roles.DOCTOR
+
+    def is_pharmacy_user(self):
+        return self.role == Roles.PHARMACY_USER
+
     def generate_email_verification_code(self):
         verification = self.email_verifications.create(code=generate_token(6))
         send_mail(
@@ -44,14 +56,6 @@ class User(AbstractUser, SafeDeleteModel):
             EmailTemplates.AUTH_VERIFICATION,
             {'verification_code': verification.code}
         )
-
-
-class Company(SafeDeleteModel):
-    name = models.BinaryField(max_length=100, null=True, blank=True)
-    logo = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey('users.User', on_delete=models.CASCADE,
-                              related_name='managing_company', null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True)
 
 
 class UserEmailVerification(models.Model):
@@ -71,40 +75,29 @@ class UserEmailVerification(models.Model):
 # Doctor Model
 class Doctor(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(max_length=100, null=True, blank=True)
-    phone = models.CharField(max_length=15, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
+        User, on_delete=models.CASCADE, null=False, blank=True)
 
 
 # Patient Model
 class Patient(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    age = models.IntegerField(null=True, blank=True)
-    email = models.EmailField(max_length=100, null=True, blank=True)
-    phone = models.CharField(max_length=15, null=True, blank=True)
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-    ]
+        User, on_delete=models.CASCADE, null=False, blank=True)
 
-    def __str__(self):
-        return self.name
+    age = models.IntegerField(null=True, blank=True)
+    Gender = models.CharField(
+        max_length=2,
+        choices=Gender.choices,
+        default=Gender.MALE,
+    )
+
+
+# Gender choice
+class Gender(models.TextChoices):
+    MALE = 'MALE', _('MALE')
+    FEMALE = 'FEMALE', _('FEMALE')
 
 
 # PharmacyUser
 class PharmacyUser(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(max_length=100, null=True, blank=True)
-    phone = models.CharField(max_length=15, null=True, blank=True)
-    password = models.CharField(max_length=100, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
+        User, on_delete=models.CASCADE, null=False, blank=True)
