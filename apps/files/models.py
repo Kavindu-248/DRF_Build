@@ -21,12 +21,12 @@ class File(models.Model):
         return self.file_name
 
 
-# Patient Attachements
+# Patient Attacheed Documents
 
 class Attachment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='attachments')
+        Patient, on_delete=models.CASCADE, related_name='attachments', null=True,)
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='attachments')
     created_at = models.DateTimeField(auto_now_add=True)
