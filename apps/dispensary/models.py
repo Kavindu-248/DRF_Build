@@ -13,10 +13,7 @@ class Pharmacy(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     pharmacy_user = models.ForeignKey(
-        PharmacyUser, on_delete=models.CASCADE, related_name='pharmacies')
-
-    def __str__(self):
-        return self.name
+        PharmacyUser, on_delete=models.CASCADE, related_name='pharmacies', null=False)
 
 
 # Prescription Model
@@ -27,9 +24,6 @@ class Prescription(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.description
-
 
 # Medicine Model
 
@@ -38,10 +32,8 @@ class Medicine(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     price = models.FloatField()
-    pharmacy = models.ManyToManyField(Pharmacy, related_name='medicines')
-
-    def __str__(self):
-        return self.name
+    pharmacy = models.ManyToManyField(
+        Pharmacy, related_name='medicines', null=False)
 
 
 # Invoice Model
@@ -51,21 +43,14 @@ class Invoice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.id
-
 
 # Order Model
-
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     Accepted = models.BooleanField(default=False)
     Rejected = models.BooleanField(default=False)
     pharmacy = models.ForeignKey(
-        Pharmacy, on_delete=models.CASCADE, related_name='orders')
-
-    def __str__(self):
-        return self.id
+        Pharmacy, on_delete=models.CASCADE, related_name='orders', null=True)
 
 
 # Vaccine Model
@@ -74,18 +59,11 @@ class Vaccine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     price = models.FloatField()
-    pharmacies = models.ManyToManyField(Pharmacy)
-
-    def __str__(self):
-        return self.name
+    pharmacies = models.ManyToManyField(Pharmacy, null=False, blank=True)
 
 
 # Country Model
-
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
-    vaccines = models.ManyToManyField(Vaccine)
-
-    def __str__(self):
-        return self.name
+    vaccines = models.ManyToManyField(Vaccine, null=True, blank=True)
