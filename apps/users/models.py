@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
 import uuid
@@ -8,6 +8,8 @@ from safedelete.models import SafeDeleteModel
 
 from apps.common.email_templates import EmailTemplates
 from apps.common.services import generate_token, send_mail
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Roles(models.TextChoices):
@@ -18,6 +20,16 @@ class Roles(models.TextChoices):
     PATIENT = 'PATIENT', _('PATIENT')
     DOCTOR = 'DOCTOR', _('DOCTOR')
     PHARMACY_USER = 'PHARMACY_USER', _('PHARMACY_USER')
+
+
+base_role = Roles.USER
+
+
+# Gender Choice
+
+class Gender(models.TextChoices):
+    MALE = 'M', 'Male'
+    FEMALE = 'F', 'Female'
 
 
 class User(AbstractUser, SafeDeleteModel):
@@ -39,15 +51,6 @@ class User(AbstractUser, SafeDeleteModel):
     def is_user(self):
         return self.role == Roles.USER
 
-    def is_patient(self):
-        return self.role == Roles.PATIENT
-
-    def is_doctor(self):
-        return self.role == Roles.DOCTOR
-
-    def is_pharmacy_user(self):
-        return self.role == Roles.PHARMACY_USER
-
     def generate_email_verification_code(self):
         verification = self.email_verifications.create(code=generate_token(6))
         send_mail(
@@ -56,6 +59,11 @@ class User(AbstractUser, SafeDeleteModel):
             EmailTemplates.AUTH_VERIFICATION,
             {'verification_code': verification.code}
         )
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.role = self.base_role
+            return super().save(*args, **kwargs)
 
 
 class UserEmailVerification(models.Model):
@@ -72,31 +80,95 @@ class UserEmailVerification(models.Model):
         ordering = ['-created_at']
 
 
+# Doctor Manager
+class DoctorManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=User.role.DOCTOR)
+
+
+class DoctorProfile(User):
+
+    base_role = Roles.DOCTOR
+
+    doctor = DoctorManager()
+
+    class Meta:
+        proxy = True
+
+
+@receiver(post_save, sender=DoctorProfile)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "DOCTOR":
+        DoctorProfile.objects.create(user=instance)
+
+
 # Doctor Model
 class Doctor(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     User = models.OneToOneField(
         User, on_delete=models.CASCADE, null=False, blank=True)
+
+
+class PatientManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=User.role.PATIENT)
+
+
+class PatientProfile(User):
+
+    base_role = Roles.PATIENT
+
+    patient = PatientManager()
+
+    class Meta:
+        proxy = True
+
+
+@receiver(post_save, sender=PatientProfile)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "PATIENT":
+        PatientProfile.objects.create(user=instance)
 
 
 # Patient Model
 class Patient(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     User = models.OneToOneField(
         User, on_delete=models.CASCADE, null=False, blank=True)
 
-    age = models.IntegerField(null=True, blank=True)
-    Gender = models.CharField(
-        max_length=2,
+    gender = models.CharField(
+        max_length=1,
         choices=Gender.choices,
+        default=Gender.MALE,
     )
 
 
-# Gender choice
-class Gender(models.TextChoices):
-    MALE = 'MALE', _('MALE')
-    FEMALE = 'FEMALE', _('FEMALE')
+class PharmacyUserManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        results = super().get_queryset(*args, **kwargs)
+        return results.filter(role=User.role.PHARMACY_USER)
+
+
+class PharmacyUserProfile(User):
+
+    base_role = Roles.PHARMACY_USER
+
+    pharmacy_user = PharmacyUserManager()
+
+    class Meta:
+        proxy = True
+
+
+@receiver(post_save, sender=PatientProfile)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "PHARMACY_USER":
+        PharmacyUserProfile.objects.create(user=instance)
 
 
 # PharmacyUser
 class PharmacyUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     User = models.OneToOneField(
         User, on_delete=models.CASCADE, null=False, blank=True)
