@@ -38,7 +38,8 @@ class TreatmentType(models.Model):
 class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=100)
-    treatment_types = models.ManyToManyField(TreatmentType, null=True, related_name='questions', null=False)
+    treatment_types = models.ManyToManyField(
+        TreatmentType, null=False, related_name='questions')
 
 
 # Answer Model
