@@ -30,7 +30,6 @@ class User(AbstractUser, SafeDeleteModel):
     role = models.CharField(
         max_length=20,
         choices=Roles.choices,
-        default=Roles.USER
     )
     phone = models.CharField(max_length=15, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
