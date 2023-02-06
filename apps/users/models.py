@@ -35,15 +35,6 @@ class User(AbstractUser, SafeDeleteModel):
     phone = models.CharField(max_length=15, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    def is_patient(self):
-        return self.role == Roles.PATIENT
-
-    def is_doctor(self):
-        return self.role == Roles.DOCTOR
-
-    def is_pharmacy_user(self):
-        return self.role == Roles.PHARMACY_USER
-
     def generate_email_verification_code(self):
         verification = self.email_verifications.create(code=generate_token(6))
         send_mail(
