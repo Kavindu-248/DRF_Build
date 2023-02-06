@@ -8,7 +8,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from apps.users.error_codes import AccountErrorCodes
-from apps.users.models import Company
 from project import settings
 
 
@@ -22,11 +21,13 @@ def create_user(validated_data):
 
 
 class AuthRegisterSerializer(serializers.ModelSerializer):
-    confirm_password = serializers.CharField(required=True, write_only=True, min_length=6)
+    confirm_password = serializers.CharField(
+        required=True, write_only=True, min_length=6)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+        fields = ['id', 'first_name', 'last_name',
+                  'email', 'password', 'confirm_password']
         extra_kwargs = {
             'id': {'read_only': True},
             'first_name': {'required': True},
@@ -54,16 +55,9 @@ class AuthRegisterSerializer(serializers.ModelSerializer):
             raise ValidationError(AccountErrorCodes.USER_EXIST)
 
 
-class CompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = '__all__'
-
-
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     email = serializers.CharField(write_only=True)
-    company = CompanySerializer(required=False)
 
     class Meta:
         model = get_user_model()
@@ -126,7 +120,8 @@ class UserResetPasswordSerializer(serializers.ModelSerializer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         try:
-            self.user = get_object_or_404(get_user_model(), email=self.initial_data['email'])
+            self.user = get_object_or_404(
+                get_user_model(), email=self.initial_data['email'])
         except Http404:
             raise ValidationError(AccountErrorCodes.UNKNOWN_USER)
 
