@@ -6,7 +6,7 @@ from apps.users.models import PharmacyUser
 # Pharamcy Model
 
 class Pharmacy(models.Model):
-    id = models(primary_key=True,  editable=False)
+    pharmacy_id = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -19,7 +19,7 @@ class Pharmacy(models.Model):
 # Prescription Model
 
 class Prescription(models.Model):
-    id = models(primary_key=True, editable=False)
+    prescription_id = models.IntegerField(primary_key=True, editable=False)
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -28,25 +28,25 @@ class Prescription(models.Model):
 # Medicine Model
 
 class Medicine(models.Model):
-    id = models(primary_key=True,  editable=False)
+    medicine_id = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     price = models.FloatField()
     pharmacy = models.ManyToManyField(
-        Pharmacy, related_name='medicines', null=False)
+        Pharmacy, related_name='medicines', null=False, verbose_name='Pharmacies')
 
 
 # Invoice Model
 
 class Invoice(models.Model):
-    id = models(primary_key=True, editable=False)
+    invoice_id = models.IntegerField(primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 # Order Model
 class Order(models.Model):
-    id = models(primary_key=True,  editable=False)
+    order_id = models.IntegerField(primary_key=True, editable=False)
     accepted = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
     pharmacy = models.ForeignKey(
@@ -56,7 +56,7 @@ class Order(models.Model):
 # Vaccine Model
 
 class Vaccine(models.Model):
-    id = models(primary_key=True, editable=False)
+    vaccine_id = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
     price = models.FloatField()
     pharmacies = models.ManyToManyField(
@@ -65,6 +65,7 @@ class Vaccine(models.Model):
 
 # Country Model
 class Country(models.Model):
-    id = models(primary_key=True, editable=False)
+    country_id = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
-    vaccines = models.ManyToManyField(Vaccine, null=True)
+    vaccines = models.ManyToManyField(
+        Vaccine, null=True, verbose_name='Vaccines')
