@@ -4,10 +4,8 @@ from apps.files.models import File
 
 
 # FormAssesment Model
-
-
 class FormAssesment(models.Model):
-    id = models(primary_key=True, editable=False)
+    form_assesment_id = models.IntegerField(primary_key=True, editable=False)
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='form_assesments', null=True)
     doctor = models.ForeignKey(
@@ -19,7 +17,8 @@ class FormAssesment(models.Model):
 
 # SubscriptionForm Model
 class SubscriptionForm(models.Model):
-    id = models(primary_key=True, editable=False)
+    subscription_form_id = models.IntegerField(
+        primary_key=True, editable=False)
     description = models.CharField(max_length=100)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(auto_now=True)
@@ -29,13 +28,13 @@ class SubscriptionForm(models.Model):
 
 # TreatmentType Model
 class TreatmentType(models.Model):
-    id = models(primary_key=True, editable=False)
+    treatment_type_id = models.IntegerField(primary_key=True, editable=False)
     sickness_type = models.CharField(max_length=100)
 
 
 # Question Model
 class Question(models.Model):
-    id = models(primary_key=True, editable=False)
+    question_id = models.IntegerField(primary_key=True, editable=False)
     text = models.CharField(max_length=100)
     treatment_types = models.ManyToManyField(
         TreatmentType, null=False, related_name='questions')
@@ -43,7 +42,7 @@ class Question(models.Model):
 
 # Answer Model
 class Answer(models.Model):
-    id = models(primary_key=True,  editable=False)
+    answer_id = models.IntegerField(primary_key=True, editable=False)
     text = models.CharField(max_length=100)
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name='answers', null=True)
@@ -54,7 +53,7 @@ class Answer(models.Model):
 # Avalability Model
 
 class Avalability(models.Model):
-    id = models(primary_key=True, editable=False)
+    avalanility_id = models.IntegerField(primary_key=True, editable=False)
     day = models.CharField(max_length=100)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
@@ -64,7 +63,7 @@ class Avalability(models.Model):
 
 # Appointment Model
 class Appointment(models.Model):
-    id = models(primary_key=True, editable=False)
+    appointment_id = models.IntegerField(primary_key=True, editable=False)
     status = models.CharField(max_length=100)
     date = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(
@@ -73,15 +72,9 @@ class Appointment(models.Model):
 
 # Attachment Model
 class Attachment(models.Model):
-    id = models(primary_key=True, editable=False)
+    attachment_id = models.IntegerField(primary_key=True, editable=False)
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='attachments', null=True,)
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='attachments')
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.file.file_name
