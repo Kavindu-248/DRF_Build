@@ -21,8 +21,8 @@ class Roles(models.TextChoices):
 
 # Gender Choice
 class Gender(models.TextChoices):
-    MALE = 'M', 'Male'
-    FEMALE = 'F', 'Female'
+    MALE = 'M', _('Male')
+    FEMALE = 'F', _('Female')
 
 
 class User(AbstractUser, SafeDeleteModel):
