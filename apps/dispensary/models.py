@@ -1,12 +1,12 @@
 from django.db import models
-import uuid
+
 from apps.users.models import PharmacyUser
 
 
 # Pharamcy Model
 
 class Pharmacy(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True,  editable=False)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -19,7 +19,7 @@ class Pharmacy(models.Model):
 # Prescription Model
 
 class Prescription(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True, editable=False)
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -28,7 +28,7 @@ class Prescription(models.Model):
 # Medicine Model
 
 class Medicine(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True,  editable=False)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     price = models.FloatField()
@@ -39,16 +39,16 @@ class Medicine(models.Model):
 # Invoice Model
 
 class Invoice(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 # Order Model
 class Order(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    Accepted = models.BooleanField(default=False)
-    Rejected = models.BooleanField(default=False)
+    id = models(primary_key=True,  editable=False)
+    accepted = models.BooleanField(default=False)
+    rejected = models.BooleanField(default=False)
     pharmacy = models.ForeignKey(
         Pharmacy, on_delete=models.CASCADE, related_name='orders', null=True)
 
@@ -56,14 +56,15 @@ class Order(models.Model):
 # Vaccine Model
 
 class Vaccine(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
     price = models.FloatField()
-    pharmacies = models.ManyToManyField(Pharmacy, null=False)
+    pharmacies = models.ManyToManyField(
+        Pharmacy, null=False, verbose_name='Pharmacies')
 
 
 # Country Model
 class Country(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models(primary_key=True, editable=False)
     name = models.CharField(max_length=100)
     vaccines = models.ManyToManyField(Vaccine, null=True)
