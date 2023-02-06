@@ -49,7 +49,7 @@ class UserEmailVerification(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='email_verifications'
     )
-    code = models.PositiveIntegerField(max_length=6)
+    code = models.PositiveIntegerField()
     verified = models.BooleanField(default=False)
     verified_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
