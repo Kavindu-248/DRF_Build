@@ -59,11 +59,11 @@ class Vaccine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     price = models.FloatField()
-    pharmacies = models.ManyToManyField(Pharmacy, null=False, blank=True)
+    pharmacies = models.ManyToManyField(Pharmacy, null=False)
 
 
 # Country Model
 class Country(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
-    vaccines = models.ManyToManyField(Vaccine, null=True, blank=True)
+    vaccines = models.ManyToManyField(Vaccine, null=True)
