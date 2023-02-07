@@ -5,7 +5,7 @@ from apps.files.models import File
 
 # FormAssesment Model
 class FormAssesment(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.IntegerField(primary_key=True, unique=True, null=False)
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='form_assesments', null=True)
     doctor = models.ForeignKey(
