@@ -56,30 +56,3 @@ class UserEmailVerification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
-
-# Doctor Model
-class Doctor(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
-
-
-# Patient Model
-class Patient(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
-
-    gender = models.CharField(
-        max_length=1,
-        choices=Gender.choices,
-        default=Gender.MALE,
-    )
-
-
-# PharmacyUser
-class PharmacyUser(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
