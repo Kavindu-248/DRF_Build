@@ -47,7 +47,7 @@ class Answer(models.Model):
 # Avalability Model
 
 class Avalability(models.Model):
-    day = models.CharField(max_length=100)
+
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
     doctor = models.ForeignKey(
