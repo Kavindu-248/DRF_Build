@@ -8,7 +8,6 @@ from safedelete.models import SafeDeleteModel
 
 from apps.common.email_templates import EmailTemplates
 from apps.common.services import generate_token, send_mail
-from django.dispatch import receiver
 
 
 class Roles(models.TextChoices):
@@ -61,13 +60,13 @@ class UserEmailVerification(models.Model):
 # Doctor Model
 class Doctor(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
+        User, on_delete=models.CASCADE)
 
 
 # Patient Model
 class Patient(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
+        User, on_delete=models.CASCADE)
 
     gender = models.CharField(
         max_length=1,
@@ -79,4 +78,4 @@ class Patient(models.Model):
 # PharmacyUser
 class PharmacyUser(models.Model):
     User = models.OneToOneField(
-        User, on_delete=models.CASCADE, null=False)
+        User, on_delete=models.CASCADE)

@@ -29,7 +29,7 @@ class Medicine(models.Model):
     description = models.CharField(max_length=100)
     price = models.FloatField()
     pharmacy = models.ManyToManyField(
-        Pharmacy, related_name='medicines', null=False, verbose_name='Pharmacies')
+        Pharmacy, related_name='medicines', null=False, related_name='Pharmacies')
 
 
 # Invoice Model
@@ -53,11 +53,11 @@ class Vaccine(models.Model):
     name = models.CharField(max_length=100)
     price = models.FloatField()
     pharmacies = models.ManyToManyField(
-        Pharmacy, null=False, verbose_name='Pharmacies')
+        Pharmacy, null=False, related_name='Pharmacies')
 
 
 # Country Model
 class Country(models.Model):
     name = models.CharField(max_length=100)
     vaccines = models.ManyToManyField(
-        Vaccine, null=True, verbose_name='Vaccines')
+        Vaccine, null=True, related_name='Vaccines')
