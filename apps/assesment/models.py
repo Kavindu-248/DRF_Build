@@ -1,95 +1,101 @@
 import datetime
 from django.db import models
-from django.forms import ValidationError
+
 from apps.users.models import Patient, Doctor
 from apps.files.models import File
 
+# Choice Fields
 
-class Sickness(models.TextChoices):
 
-    DIABETES = 'DIABETES', 'Diabetes'
-    CHOLESTREROL = 'CHOLESTREROL', 'Cholestrerol'
-    HYPERTENSION = 'HYPERTENSION', 'Hypertension'
-    BLOOD_PRESSURE = 'BLOOD_PRESSURE', 'Blood Pressure'
+class TreatmentOptions(models.TextChoices):
+
+    DIABETES = 'DIABETES', ('DIABETES')
+    CHOLESTREROL = 'CHOLESTREROL', ('CHOLESTREROL')
+    HYPERTENSION = 'HYPERTENSION', ('HYPERTENSION')
+    BLOOD_PRESSURE = 'BLOOD_PRESSURE', ('BLOOD PRESSURE')
+
+
+class Status(models.TextChoices):
+
+    ONGOING = 'ONGOING', ('ONGOING')
+    COMPLETED = 'COMPLETED', ('COMPLETED')
 
 
 # FormAssesment Model
 class FormAssesment(models.Model):
-    STATUS_CHOICES = [
-        ('ongoing', 'Ongoing'),
-        ('completed', 'Completed'),
-    ]
-
     status = models.CharField(
         max_length=100,
-        choices=STATUS_CHOICES,
-        default='ongoing'
+        choices=Status.choices,
+        default=Status.ONGOING
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='form_assesments', null=True)
+        Patient, on_delete=models.CASCADE, related_name='form_assesments')
     doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name='form_assesments', null=True)
 
 
 # SubscriptionForm Model
 class SubscriptionForm(models.Model):
-    description = models.CharField(max_length=100)
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(auto_now=True)
+
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    delivered_on = models.DateTimeField()
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='subscription_forms', null=True)
+        Patient, on_delete=models.CASCADE, related_name='subscription_forms')
 
 
 # TreatmentType Model
-
 class TreatmentType(models.Model):
-    sickness = models.CharField(
+    treatment_options = models.CharField(
         max_length=100,
-        choices=Sickness.choices,
-        default=Sickness.DIABETES)
+        choices=TreatmentOptions.choices,
+        default=TreatmentOptions.DIABETES)
 
 
 # Question Model
 class Question(models.Model):
-    text = models.CharField(max_length=100)
+    question = models.CharField(max_length=100)
+    answered = models.BooleanField(default=False)
     treatment_types = models.ManyToManyField(
-        TreatmentType, null=False, related_name='questions')
+        TreatmentType,  related_name='questions')
 
 
 # Answer Model
 class Answer(models.Model):
-    text = models.CharField(max_length=100)
+    answer = models.CharField(max_length=100)
     question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name='answers', null=True)
+        Question, on_delete=models.CASCADE, related_name='answers')
     FormAssesment = models.ForeignKey(
-        FormAssesment, on_delete=models.CASCADE, related_name='answers', null=False)
+        FormAssesment, on_delete=models.CASCADE, related_name='answers')
+
+
+# Appointment Model
+class Appointment(models.Model):
+
+    date = models.DateTimeField()
+    time = models.DateTimeField()
+    is_confirmed = models.BooleanField(default=False)
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name='appointments')
 
 
 # Avalability Model
-class Avalability(models.Model):
+class Consultation(models.Model):
     day = models.CharField(max_length=100)
-    start_time = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField()
     slot_duration = models.DurationField(
         default=datetime.timedelta(minutes=15))
     doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name='avalabilities', null=True)
 
 
-# Appointment Model
-class Appointment(models.Model):
-
-    date = models.DateTimeField(auto_now_add=True)
-    time = models.DateTimeField(auto_now=True)
-    patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='appointments', null=True)
-
-
 # Attachment Model
 class Attachment(models.Model):
     patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='attachments', null=True,)
+        Patient, on_delete=models.CASCADE, related_name='attachments')
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='attachments')
     created_at = models.DateTimeField(auto_now_add=True)
