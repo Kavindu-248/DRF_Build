@@ -4,6 +4,7 @@ from django.db import models
 from apps.users.models import Patient, Doctor
 from apps.files.models import File
 
+
 # Choice Fields
 
 
@@ -44,6 +45,8 @@ class SubscriptionForm(models.Model):
     delivered_on = models.DateTimeField()
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='subscription_forms')
+    subscription_assesment = models.OneToOneField(
+        FormAssesment, on_delete=models.CASCADE, related_name='subscription_form')
 
 
 # TreatmentType Model
@@ -83,6 +86,10 @@ class Appointment(models.Model):
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='appointments')
     booked = models.BooleanField(default=False)
+    attachment = models.ForeignKey(
+        'Attachment', on_delete=models.CASCADE, related_name='appointments', null=True)
+    avalability = models.OneToOneField(
+        Avalability, on_delete=models.CASCADE, related_name='appointments')
 
 
 # Attachment Model

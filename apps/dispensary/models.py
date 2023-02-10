@@ -1,5 +1,6 @@
 from django.db import models
 from apps.users.models import PharmacyUser
+from apps.assesment.models import FormAssessment, Appointment
 
 
 # Choice Fields
@@ -10,7 +11,7 @@ class OrderStatus(models.TextChoices):
     REJECTED = 'REJECTED', ('REJECTED')
 
 
-class ServiceProvided(models.TextChoices):
+class ServiceCharged(models.TextChoices):
     FORM_ASSESMENTS_SERVICE = 'FORM_ASSESMENTS_SERVICE', (
         'FORM ASSESMENTS SERVICE')
     VIDEO_CONSULTATION = 'VIDEO_CONSULTATION', ('VIDEO CONSULTATION')
@@ -40,8 +41,10 @@ class Pharmacy(models.Model):
 # Prescription Model
 
 class Prescription(models.Model):
-    medication = models.CharField(max_length=100)
-    quantity = models.CharField(max_length=100)
+
+    quantity = models.IntegerField()
+    medicine = models.ForeignKey(
+        'Medicine', on_delete=models.CASCADE, related_name='prescriptions')
     prescription_status = models.CharField(
         max_length=100,
         choices=PrescriptionStatus.choices,
@@ -49,6 +52,11 @@ class Prescription(models.Model):
 
 
     )
+    assessment = models.OneToOneField(
+        FormAssessment, on_delete=models.CASCADE, related_name='prescriptions')
+
+    appointment = models.OneToOneField(
+        Appointment, on_delete=models.CASCADE, related_name='prescriptions')
 
     verified = models.BooleanField(default=False)
 
@@ -69,7 +77,7 @@ class Medicine(models.Model):
 class Invoice(models.Model):
     service_provided = models.CharField(
         max_length=100,
-        choices=ServiceProvided.choices,
+        choices=ServiceCharged.choices,
     )
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -93,6 +101,19 @@ class Order(models.Model):
     )
     pharmacy = models.ForeignKey(
         Pharmacy, on_delete=models.CASCADE, related_name='orders')
+
+    prescription = models.OneToOneField(
+        Prescription, on_delete=models.CASCADE, related_name='orders')
+
+    invoice = models.OneToOneField(
+        Invoice, on_delete=models.CASCADE, related_name='orders')
+
+    assesment = models.OneToOneField(
+        FormAssessment, on_delete=models.CASCADE, related_name='orders', null=True)
+
+    appointment = models.OneToOneField(
+        Appointment, on_delete=models.CASCADE, related_name='orders', null=True)
+
 
 # Vaccine Model
 
