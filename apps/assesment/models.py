@@ -7,7 +7,7 @@ from apps.files.models import File
 # Choice Fields
 
 
-class TreatmentOptions(models.TextChoices):
+class TreatmentOption(models.TextChoices):
 
     DIABETES = 'DIABETES', ('DIABETES')
     CHOLESTREROL = 'CHOLESTREROL', ('CHOLESTREROL')
@@ -15,7 +15,7 @@ class TreatmentOptions(models.TextChoices):
     BLOOD_PRESSURE = 'BLOOD_PRESSURE', ('BLOOD PRESSURE')
 
 
-class Status(models.TextChoices):
+class FormAssesmentStatus(models.TextChoices):
 
     ONGOING = 'ONGOING', ('ONGOING')
     COMPLETED = 'COMPLETED', ('COMPLETED')
@@ -25,8 +25,7 @@ class Status(models.TextChoices):
 class FormAssesment(models.Model):
     status = models.CharField(
         max_length=100,
-        choices=Status.choices,
-        default=Status.ONGOING
+        choices=FormAssesmentStatus.choices,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,17 +48,15 @@ class SubscriptionForm(models.Model):
 
 # TreatmentType Model
 class TreatmentType(models.Model):
-    treatment_options = models.CharField(
+    treatment_option = models.CharField(
         max_length=100,
-        choices=TreatmentOptions.choices,
-        default=TreatmentOptions.DIABETES)
+        choices=TreatmentOption.choices,)
 
 
 # Question Model
 class Question(models.Model):
     question = models.CharField(max_length=100)
-    answered = models.BooleanField(default=False)
-    treatment_types = models.ManyToManyField(
+    treatment_type = models.ManyToManyField(
         TreatmentType,  related_name='questions')
 
 
@@ -72,24 +69,20 @@ class Answer(models.Model):
         FormAssesment, on_delete=models.CASCADE, related_name='answers')
 
 
-# Appointment Model
-class Appointment(models.Model):
-
-    date = models.DateTimeField()
-    time = models.DateTimeField()
-    is_confirmed = models.BooleanField(default=False)
-    patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name='appointments')
-
-
 # Avalability Model
-class Consultation(models.Model):
+class Avalability(models.Model):
     day = models.CharField(max_length=100)
     start_time = models.DateTimeField()
-    slot_duration = models.DurationField(
-        default=datetime.timedelta(minutes=15))
+    end_time = models.DateTimeField()
     doctor = models.ForeignKey(
-        Doctor, on_delete=models.CASCADE, related_name='avalabilities', null=True)
+        Doctor, on_delete=models.CASCADE, related_name='avalabilities')
+
+
+# Appointment Model
+class Appointment(models.Model):
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name='appointments')
+    booked = models.BooleanField(default=False)
 
 
 # Attachment Model

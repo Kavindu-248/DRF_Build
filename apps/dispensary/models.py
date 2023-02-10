@@ -30,12 +30,6 @@ class PrescriptionStatus(models.TextChoices):
 
 # Pharamcy Model
 class Pharmacy(models.Model):
-    order_status = models.CharField(
-        max_length=100,
-        choices=OrderStatus.choices,
-        default=OrderStatus.PENDING
-    )
-
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -47,11 +41,13 @@ class Pharmacy(models.Model):
 
 class Prescription(models.Model):
     medication = models.CharField(max_length=100)
-
+    quantity = models.CharField(max_length=100)
     prescription_status = models.CharField(
         max_length=100,
         choices=PrescriptionStatus.choices,
         default=PrescriptionStatus.PENDING
+
+
     )
 
     verified = models.BooleanField(default=False)
@@ -74,38 +70,43 @@ class Invoice(models.Model):
     service_provided = models.CharField(
         max_length=100,
         choices=ServiceProvided.choices,
-        default=ServiceProvided.FORM_ASSESMENTS_SERVICE
     )
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    payment_options = models.CharField(
+    payment_option = models.CharField(
         max_length=100,
         choices=PaymentOptions.choices,
-        default=PaymentOptions.CREDIT_CARD
     )
 
     date_due = models.DateField()
 
-
 # Order Model
-# #class Order(models.Model):
-#     accepted = models.BooleanField(default=False)
-#     rejected = models.BooleanField(default=False)
-#     pharmacy = models.ForeignKey(
-#        Pharmacy, on_delete=models.CASCADE, related_name='orders', null=True)
+
+
+class Order(models.Model):
+    order_status = models.CharField(
+        max_length=100,
+        choices=OrderStatus.choices,
+        default=OrderStatus.PENDING
+
+    )
+    pharmacy = models.ForeignKey(
+        Pharmacy, on_delete=models.CASCADE, related_name='orders')
 
 # Vaccine Model
+
+
 class Vaccine(models.Model):
     name = models.CharField(max_length=100)
     quantity = models.IntegerField()
     price = models.FloatField()
-    pharmacies = models.ManyToManyField(
+    pharmacy = models.ManyToManyField(
         Pharmacy,  related_name='Pharmacies')
 
 
 # Country Model
 class Country(models.Model):
     name = models.CharField(max_length=100)
-    vaccines = models.ManyToManyField(
+    vaccine = models.ManyToManyField(
         Vaccine, null=True, related_name='Vaccines', null=True)
