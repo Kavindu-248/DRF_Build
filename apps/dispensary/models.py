@@ -88,8 +88,8 @@ class Invoice(models.Model):
     order = models.OneToOneField(
         'Order', on_delete=models.CASCADE, related_name='invoices')
 
-# Order Model
 
+# Order Model
 
 class Order(models.Model):
     order_status = models.CharField(
@@ -109,7 +109,6 @@ class Order(models.Model):
    
 
 # Vaccine Model
-
 
 class Vaccine(models.Model):
     name = models.CharField(max_length=100)

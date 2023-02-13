@@ -42,8 +42,12 @@ class FormAssesment(models.Model):
     prescription = models.OneToOneField(    
         Prescription, on_delete=models.CASCADE, related_name='form_assesments', null=True, blank=True)
 
-    order = models.OneToOneField(
+    order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name='form_assesments')
+    
+    subscription_form = models.OneToOneField(
+        SubscriptionForm, on_delete=models.CASCADE, related_name='form_assesments', null=True, blank=True
+    )
 
 
 # SubscriptionForm Model
@@ -54,9 +58,7 @@ class SubscriptionForm(models.Model):
     delivered_on = models.DateTimeField()
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='subscription_forms')
-    form_assesment = models.OneToOneField(
-        FormAssesment, on_delete=models.CASCADE, related_name='subscription_forms')
-
+    
 
 # TreatmentType Model
 class TreatmentType(models.Model):
@@ -77,7 +79,7 @@ class Answer(models.Model):
     answer = models.TextField()
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name='answers')
-    FormAssesment = models.ForeignKey(
+    form_assesment = models.ForeignKey(
         FormAssesment, on_delete=models.CASCADE, related_name='answers')
 
 
@@ -86,33 +88,35 @@ class Avalability(models.Model):
     
    date = models.DateField()
    start_time = models.TimeField()
-   duration = models.DurationField(default=timedelta(minutes=15))
+   duration = models.IntervalField()
    doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name='avalabilities')
-
+    
+    
 
 # Appointment Model
 class Appointment(models.Model):
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='appointments')
     booked = models.BooleanField(default=False)
-    avalability = models.OneToOneField(
+    availability = models.ForeignKey(
         Avalability, on_delete=models.CASCADE, related_name='appointments')
 
     prescription = models.OneToOneField(
         Prescription, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
     
-    order = models.OneToOneField(
+    order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name='appointments')
 
+    
 
-
+    
 # Attachment Model
 class Attachment(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='attachments')
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='attachments')
-    created_at = models.DateTimeField(auto_now_add=True)
-    appointment = models.OneToOneField(
-        Appointment, on_delete=models.CASCADE, related_name='attachments')
+    appointment = models.ForeignKey(
+        Appointment, on_delete=models.CASCADE, related_name='attachments', null=True, blank=True)
