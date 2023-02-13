@@ -11,7 +11,7 @@ class OrderStatus(models.TextChoices):
     REJECTED = 'REJECTED', ('REJECTED')
 
 
-class ServiceCharged(models.TextChoices):
+class ServiceTypes(models.TextChoices):
     FORM_ASSESMENTS_SERVICE = 'FORM_ASSESMENTS_SERVICE', (
         'FORM ASSESMENTS SERVICE')
     VIDEO_CONSULTATION = 'VIDEO_CONSULTATION', ('VIDEO CONSULTATION')
@@ -43,8 +43,6 @@ class Pharmacy(models.Model):
 class Prescription(models.Model):
 
     quantity = models.IntegerField()
-    medicine = models.ForeignKey(
-        'Medicine', on_delete=models.CASCADE, related_name='prescriptions')
     prescription_status = models.CharField(
         max_length=100,
         choices=PrescriptionStatus.choices,
@@ -52,12 +50,7 @@ class Prescription(models.Model):
 
 
     )
-    assessment = models.OneToOneField(
-        FormAssessment, on_delete=models.CASCADE, related_name='prescriptions')
-
-    appointment = models.OneToOneField(
-        Appointment, on_delete=models.CASCADE, related_name='prescriptions')
-
+ 
     verified = models.BooleanField(default=False)
 
 
@@ -69,7 +62,10 @@ class Medicine(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
     pharmacy = models.ManyToManyField(
-        Pharmacy, related_name='medicines', related_name='Pharmacies')
+        Pharmacy, related_name='medicines', related_name='pharmacies')
+    prescription = models.ManyToManyField(
+        Prescription, related_name='medicines', related_name='prescriptions')
+    
 
 
 # Invoice Model
@@ -77,7 +73,7 @@ class Medicine(models.Model):
 class Invoice(models.Model):
     service_provided = models.CharField(
         max_length=100,
-        choices=ServiceCharged.choices,
+        choices=ServiceTypes.choices,
     )
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -88,6 +84,9 @@ class Invoice(models.Model):
     )
 
     date_due = models.DateField()
+
+    order = models.OneToOneField(
+        'Order', on_delete=models.CASCADE, related_name='invoices')
 
 # Order Model
 
@@ -104,16 +103,10 @@ class Order(models.Model):
 
     prescription = models.OneToOneField(
         Prescription, on_delete=models.CASCADE, related_name='orders')
+    
+    is_prepared = models.BooleanField(default=False)
 
-    invoice = models.OneToOneField(
-        Invoice, on_delete=models.CASCADE, related_name='orders')
-
-    assesment = models.OneToOneField(
-        FormAssessment, on_delete=models.CASCADE, related_name='orders', null=True)
-
-    appointment = models.OneToOneField(
-        Appointment, on_delete=models.CASCADE, related_name='orders', null=True)
-
+   
 
 # Vaccine Model
 
@@ -123,11 +116,11 @@ class Vaccine(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
     pharmacy = models.ManyToManyField(
-        Pharmacy,  related_name='Pharmacies')
+        Pharmacy,  related_name='pharmacies')
 
 
 # Country Model
 class Country(models.Model):
     name = models.CharField(max_length=100)
     vaccine = models.ManyToManyField(
-        Vaccine, null=True, related_name='Vaccines', null=True)
+        Vaccine,  related_name='vaccines')
