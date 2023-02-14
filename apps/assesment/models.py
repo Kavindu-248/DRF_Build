@@ -99,8 +99,8 @@ class Appointment(models.Model):
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='appointments')
     booked = models.BooleanField(default=False)
-    availability = models.ForeignKey(
-        Avalability, on_delete=models.CASCADE, related_name='appointments')
+    availability = models.OneToOneField(
+        Avalability, on_delete=models.CASCADE, related_name='appointment')
 
     prescription = models.OneToOneField(
         Prescription, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
@@ -110,7 +110,6 @@ class Appointment(models.Model):
 
     
 
-    
 # Attachment Model
 class Attachment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

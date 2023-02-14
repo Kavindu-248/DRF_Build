@@ -107,7 +107,6 @@ class Order(models.Model):
     is_prepared = models.BooleanField(default=False)
 
    
-
 # Vaccine Model
 
 class Vaccine(models.Model):
