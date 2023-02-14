@@ -68,6 +68,25 @@ class Medicine(models.Model):
     
 
 
+# Order Model
+
+class Order(models.Model):
+    order_status = models.CharField(
+        max_length=100,
+        choices=OrderStatus.choices,
+        default=OrderStatus.PENDING
+
+    )
+    pharmacy = models.ForeignKey(
+        Pharmacy, on_delete=models.CASCADE, related_name='orders')
+
+    prescription = models.OneToOneField(
+        Prescription, on_delete=models.CASCADE, related_name='orders')
+    
+    is_prepared = models.BooleanField(default=False)
+
+
+
 # Invoice Model
 
 class Invoice(models.Model):
@@ -86,29 +105,13 @@ class Invoice(models.Model):
     date_due = models.DateField()
 
     order = models.OneToOneField(
-        'Order', on_delete=models.CASCADE, related_name='invoices')
+        Order, on_delete=models.CASCADE, related_name='invoices')
 
 
-# Order Model
 
-class Order(models.Model):
-    order_status = models.CharField(
-        max_length=100,
-        choices=OrderStatus.choices,
-        default=OrderStatus.PENDING
-
-    )
-    pharmacy = models.ForeignKey(
-        Pharmacy, on_delete=models.CASCADE, related_name='orders')
-
-    prescription = models.OneToOneField(
-        Prescription, on_delete=models.CASCADE, related_name='orders')
-    
-    is_prepared = models.BooleanField(default=False)
 
    
 # Vaccine Model
-
 class Vaccine(models.Model):
     name = models.CharField(max_length=100)
     quantity = models.IntegerField()
