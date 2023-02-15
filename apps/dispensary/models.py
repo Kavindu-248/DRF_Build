@@ -40,15 +40,23 @@ class Pharmacy(models.Model):
 
 # Prescription Model
 
-class Prescription(models.Model):
+class Prescription (models.Model):
 
+    pharmacy = models.OneToOneField(
+        Pharmacy, on_delete=models.CASCADE, related_name='prescriptions')
+    
+    form_assessment = models.OneToOneField(
+        FormAssessment, on_delete=models.CASCADE, related_name='prescriptions')
+    
+    appointment = models.OneToOneField(
+        Appointment, on_delete=models.CASCADE, related_name='prescriptions')
+    
     quantity = models.IntegerField()
     prescription_status = models.CharField(
         max_length=100,
         choices=PrescriptionStatus.choices,
         default=PrescriptionStatus.PENDING
-
-
+  
     )
  
     verified = models.BooleanField(default=False)
@@ -69,7 +77,6 @@ class Medicine(models.Model):
 
 
 # Order Model
-
 class Order(models.Model):
     order_status = models.CharField(
         max_length=100,
@@ -108,9 +115,6 @@ class Invoice(models.Model):
         Order, on_delete=models.CASCADE, related_name='invoices')
 
 
-
-
-   
 # Vaccine Model
 class Vaccine(models.Model):
     name = models.CharField(max_length=100)
@@ -118,6 +122,8 @@ class Vaccine(models.Model):
     price = models.FloatField()
     pharmacy = models.ManyToManyField(
         Pharmacy,  related_name='pharmacies')
+
+
 
 
 # Country Model

@@ -39,15 +39,9 @@ class FormAssesment(models.Model):
     doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name='form_assesments', null=True, blank=True)
     
-    prescription = models.OneToOneField(    
-        Prescription, on_delete=models.CASCADE, related_name='form_assesments', null=True, blank=True)
-
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name='form_assesments')
-    
-    subscription_form = models.OneToOneField(
-        SubscriptionForm, on_delete=models.CASCADE, related_name='form_assesments', null=True, blank=True
-    )
+
 
 
 # SubscriptionForm Model
@@ -58,6 +52,9 @@ class SubscriptionForm(models.Model):
     delivered_on = models.DateTimeField()
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name='subscription_forms')
+    
+    form_assesment = models.OneToOneField(
+        FormAssesment, on_delete=models.CASCADE, related_name='subscription_forms')
     
 
 # TreatmentType Model
@@ -74,6 +71,7 @@ class Question(models.Model):
         TreatmentType,  related_name='questions')
 
 
+
 # Answer Model
 class Answer(models.Model):
     answer = models.TextField()
@@ -81,6 +79,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name='answers')
     form_assesment = models.ForeignKey(
         FormAssesment, on_delete=models.CASCADE, related_name='answers')
+        
 
 
 # Avalability Model
@@ -88,7 +87,7 @@ class Avalability(models.Model):
     
    date = models.DateField()
    start_time = models.TimeField()
-   duration = models.IntervalField()
+    end_time = models.TimeField()
    doctor = models.ForeignKey(
         Doctor, on_delete=models.CASCADE, related_name='avalabilities')
     
@@ -102,8 +101,7 @@ class Appointment(models.Model):
     availability = models.OneToOneField(
         Avalability, on_delete=models.CASCADE, related_name='appointment')
 
-    prescription = models.OneToOneField(
-        Prescription, on_delete=models.CASCADE, related_name='appointments', null=True, blank=True)
+    
     
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name='appointments')
@@ -118,4 +116,4 @@ class Attachment(models.Model):
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='attachments')
     appointment = models.ForeignKey(
-        Appointment, on_delete=models.CASCADE, related_name='attachments', null=True, blank=True)
+        Appointment, on_delete=models.CASCADE, related_name='attachments')
