@@ -42,7 +42,7 @@ class SubscriptionForm(models.Model):
     end_date = models.DateTimeField()
     delivered_on = models.DateTimeField()
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='subscription_forms')
-    form_assesment = models.OneToOneField(FormAssesment, on_delete=models.CASCADE, related_name='subscription_forms')
+    form_assesment = models.OneToOneField(FormAssesment, on_delete=models.CASCADE, related_name='subscription_form')
 
 
 # TreatmentType Model

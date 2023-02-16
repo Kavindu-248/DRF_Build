@@ -46,8 +46,8 @@ class Prescription (models.Model):
         default=PrescriptionStatus.PENDING
     )
     verified = models.BooleanField(default=False)
-    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='prescriptions')
-    appointment = models.OneToOneField('assesment.Appointment', on_delete=models.CASCADE, related_name='prescriptions')
+    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='prescription')
+    appointment = models.OneToOneField('assesment.Appointment', on_delete=models.CASCADE, related_name='prescription')
     
    
 # Medicine Model
@@ -70,10 +70,10 @@ class Order(models.Model):
         )
     pharmacy = models.ForeignKey( Pharmacy, on_delete=models.CASCADE, related_name='orders')
 
-    prescription = models.OneToOneField(Prescription, on_delete=models.CASCADE, related_name='orders')
+    prescription = models.OneToOneField(Prescription, on_delete=models.CASCADE, related_name='order')
     
     is_prepared = models.BooleanField(default=False)
-    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='orders')
+    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='order')
 
 
 
@@ -93,7 +93,7 @@ class Invoice(models.Model):
 
     date_due = models.DateField()
 
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoices')
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
 
 
 # Vaccine Model
