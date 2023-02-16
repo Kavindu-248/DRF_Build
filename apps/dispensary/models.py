@@ -1,6 +1,5 @@
 from django.db import models
 from apps.users.models import PharmacyUser
-from apps.assesment.models import FormAssessment, Appointment
 
 
 # Choice Fields
@@ -34,34 +33,23 @@ class Pharmacy(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
-    pharmacy_user = models.ForeignKey(
-        PharmacyUser, on_delete=models.CASCADE, related_name='pharmacies')
+    pharmacy_user = models.ForeignKey(PharmacyUser, on_delete=models.CASCADE, related_name='pharmacies')
 
 
 # Prescription Model
 
 class Prescription (models.Model):
-
-    pharmacy = models.OneToOneField(
-        Pharmacy, on_delete=models.CASCADE, related_name='prescriptions')
-    
-    form_assessment = models.OneToOneField(
-        FormAssessment, on_delete=models.CASCADE, related_name='prescriptions')
-    
-    appointment = models.OneToOneField(
-        Appointment, on_delete=models.CASCADE, related_name='prescriptions')
-    
     quantity = models.IntegerField()
     prescription_status = models.CharField(
         max_length=100,
         choices=PrescriptionStatus.choices,
         default=PrescriptionStatus.PENDING
-  
     )
- 
     verified = models.BooleanField(default=False)
-
-
+    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='prescriptions')
+    appointment = models.OneToOneField('assesment.Appointment', on_delete=models.CASCADE, related_name='prescriptions')
+    
+   
 # Medicine Model
 class Medicine(models.Model):
 
@@ -69,12 +57,9 @@ class Medicine(models.Model):
     description = models.CharField(max_length=100)
     quantity = models.IntegerField()
     price = models.FloatField()
-    pharmacy = models.ManyToManyField(
-        Pharmacy, related_name='medicines', related_name='pharmacies')
-    prescription = models.ManyToManyField(
-        Prescription, related_name='medicines', related_name='prescriptions')
+    pharmacy = models.ManyToManyField(Pharmacy, related_name='medicines')
+    prescription = models.ManyToManyField(Prescription, related_name='medicines')
     
-
 
 # Order Model
 class Order(models.Model):
@@ -82,15 +67,13 @@ class Order(models.Model):
         max_length=100,
         choices=OrderStatus.choices,
         default=OrderStatus.PENDING
+        )
+    pharmacy = models.ForeignKey( Pharmacy, on_delete=models.CASCADE, related_name='orders')
 
-    )
-    pharmacy = models.ForeignKey(
-        Pharmacy, on_delete=models.CASCADE, related_name='orders')
-
-    prescription = models.OneToOneField(
-        Prescription, on_delete=models.CASCADE, related_name='orders')
+    prescription = models.OneToOneField(Prescription, on_delete=models.CASCADE, related_name='orders')
     
     is_prepared = models.BooleanField(default=False)
+    form_assesment = models.OneToOneField('assesment.FormAssesment', on_delete=models.CASCADE, related_name='orders')
 
 
 
@@ -101,7 +84,6 @@ class Invoice(models.Model):
         max_length=100,
         choices=ServiceTypes.choices,
     )
-
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     payment_option = models.CharField(
@@ -111,8 +93,7 @@ class Invoice(models.Model):
 
     date_due = models.DateField()
 
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name='invoices')
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoices')
 
 
 # Vaccine Model
@@ -120,14 +101,15 @@ class Vaccine(models.Model):
     name = models.CharField(max_length=100)
     quantity = models.IntegerField()
     price = models.FloatField()
-    pharmacy = models.ManyToManyField(
-        Pharmacy,  related_name='pharmacies')
-
+    pharmacy = models.ManyToManyField(Pharmacy, related_name='vaccines')           
 
 
 
 # Country Model
 class Country(models.Model):
     name = models.CharField(max_length=100)
-    vaccine = models.ManyToManyField(
-        Vaccine,  related_name='vaccines')
+    vaccine = models.ManyToManyField(Vaccine,  related_name='countries')
+    
+
+
+
