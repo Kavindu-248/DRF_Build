@@ -1,11 +1,11 @@
-from django.urls import path
-from .views import avalability_list, avalability_detail
-from rest_framework.urlpatterns import format_suffix_patterns
-from apps.assesment import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from apps.assesment.views import AvalabilityViewSet
+
+router = DefaultRouter()
+router.register('avalabilities', AvalabilityViewSet)
+
 
 urlpatterns = [
-    path('avalability/', views.avalability_list.as_view()),
-    path('avalability/<int:pk>/', views.avalability_detail.as_view()),
+    path('', include(router.urls)),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)
