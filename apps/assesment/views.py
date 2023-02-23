@@ -11,4 +11,4 @@ from rest_framework import permissions
 class AvalabilityViewSet(viewsets.ModelViewSet):
     queryset = Avalability.objects.all()
     serializer_class = AvalabilitySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
