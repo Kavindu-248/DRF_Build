@@ -32,7 +32,7 @@ router = DefaultRouter()
 router.register('auth', AuthViewSet, basename='auth')
 router.register('users', UserViewSet, basename='users')
 router.register('files', FileViewSet, basename='files')
-router.register('avalability', AvalabilityViewSet, basename='avalability')
+router.register('avalabilities', AvalabilityViewSet, basename='avalability')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
