@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 
 from apps.files.views import FileViewSet
-from apps.users.views import AuthViewSet, UserViewSet
+from apps.users.views import AuthViewSet, UserViewSet, DoctorViewSet, PatientViewSet, PharmacyUserViewSet
 from apps.assesment.views import AvalabilityViewSet
 
 
@@ -33,6 +33,11 @@ router.register('auth', AuthViewSet, basename='auth')
 router.register('users', UserViewSet, basename='users')
 router.register('files', FileViewSet, basename='files')
 router.register('avalabilities', AvalabilityViewSet, basename='avalability')
+router.register('doctors', DoctorViewSet, basename='doctors')
+router.register('patients', PatientViewSet, basename='patients')
+router.register('pharmacy-users', PharmacyUserViewSet,
+                basename='pharmacy-users')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,6 +47,8 @@ urlpatterns = [
          name='token_obtain_pair'),
     path('api/auth/token/refresh/',
          TokenRefreshView.as_view(), name='token_refresh'),
+
+
 
 
 ]

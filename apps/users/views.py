@@ -5,12 +5,13 @@ from rest_framework import status
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
 from django.db.models import Q
 
 from apps.users.permissions import AnonWriteOnly, NotAllowed
 from apps.users.serializers import AuthRegisterSerializer, UserSerializer, PasswordChangeSerializer, \
     ProfileUpdateSerializer, UserRequestResetPasswordSerializer, UserResetPasswordSerializer
-from apps.users.models import User, Roles
+from apps.users.models import User, Doctor, Patient, PharmacyUser
 from apps.users.services import request_password_reset
 from project import settings
 
@@ -34,7 +35,8 @@ class AuthViewSet(ViewSet):
 
     @action(methods=['post'], detail=False, url_path='change-password')
     def change_password(self, request):
-        serializer = PasswordChangeSerializer(data=request.data, instance=request.user)
+        serializer = PasswordChangeSerializer(
+            data=request.data, instance=request.user)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response()
@@ -74,20 +76,50 @@ class UserViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+    def register_doctor(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            doctor = serializer.save()
+            user = User.objects.create(
+                username=doctor.username, email=doctor.email)
+            user.doctorprofile = doctor
+            user.save()
+            return Response(UserSerializer(user).data)
+        return Response(serializer.errors, status=400)
 
-    def filter_queryset(self, queryset):
-        return queryset.filter(Q(is_active=True) & ~Q(role=Roles.SUPER_ADMIN))
+    def register_patient(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            patient = serializer.save()
+            user = User.objects.create(
+                username=patient.username, email=patient.email)
+            user.patientprofile = patient
+            user.save()
+            return Response(UserSerializer(user).data)
+        return Response(serializer.errors, status=400)
 
-    @action(detail=False, methods=['get', 'put', 'patch'])
-    def me(self, request):
-        if request.method == 'get':
-            serializer = UserSerializer(request.user)
-            return Response(serializer.data)
-        else:
-            serializer = ProfileUpdateSerializer(data=request.data, instance=request.user, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-            return serializer.data
+    def register_pharmacy_user(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            pharmacy_user = serializer.save()
+            user = User.objects.create(
+                username=pharmacy_user.username, email=pharmacy_user.email)
+            user.pharmacyuserprofile = pharmacy_user
+            user.save()
+            return Response(UserSerializer(user).data)
+        return Response(serializer.errors, status=400)
+
+
+class DoctorViewSet(ModelViewSet):
+    queryset = Doctor.objects.all()
+    serializer_class = UserSerializer
+
+
+class PatientViewSet(ModelViewSet):
+    queryset = Patient.objects.all()
+    serializer_class = UserSerializer
+
+
+class PharmacyUserViewSet(ModelViewSet):
+    queryset = PharmacyUser.objects.all()
+    serializer_class = UserSerializer
