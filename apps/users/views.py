@@ -10,7 +10,7 @@ from django.db.models import Q
 from apps.users.permissions import AnonWriteOnly, NotAllowed
 from apps.users.serializers import AuthRegisterSerializer, UserSerializer, PasswordChangeSerializer, \
     ProfileUpdateSerializer, UserRequestResetPasswordSerializer, UserResetPasswordSerializer
-from apps.users.models import User, Roles
+from apps.users.models import User
 from apps.users.services import request_password_reset
 from project import settings
 
@@ -27,10 +27,29 @@ class AuthViewSet(ViewSet):
 
     @action(methods=['post'], detail=False)
     def register(self, request):
+
         serializer = AuthRegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            role = request.data.get('role')
+            if role == 'doctor':
+                doctor_role = User.objects.create(role=serializer)
+            elif role == 'patient':
+                patient_role = User.objects.create(role=serializer)
+            elif role == 'pharmacy_user':
+                pharmacy_user_role = User.objects.create(
+                    role=serializer)
+            else:
+                return Response({'error': 'Invalid role specified'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Serialize the user and role objects and return the response
+            user_serializer = UserSerializer(serializer)
+            role_serializer = UserSerializer(
+                doctor_role or patient_role or pharmacy_user_role)
+            return Response({'user': user_serializer.data, 'role': role_serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False, url_path='change-password')
     def change_password(self, request):
@@ -78,15 +97,6 @@ class UserViewSet(ModelViewSet):
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(Q(is_active=True) & ~Q(role=Roles.DOCTOR))
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(Q(is_active=True) & ~Q(role=Roles.PATIENT))
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(Q(is_active=True) & ~Q(role=Roles.PHARMACY_USER))
 
     @action(detail=False, methods=['get', 'put', 'patch'])
     def me(self, request):
